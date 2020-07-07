@@ -1,0 +1,4 @@
+log_path: logs/app.log
+is_prod: true
+database_type: postgres
+database_uri: host=localhost port=5432 user=postgres dbname=its_rankings password=postgres
