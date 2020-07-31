@@ -41,6 +41,17 @@ func TestLanguage_Validate(t *testing.T) {
 	processor.AssertExpectations(t)
 }
 
+// Should create a name processor
+func TestLanguage_InitNameProcessor(t *testing.T) {
+	conn := db.NewConnection()
+	defer conn.Close()
+	Migrate(conn)
+	lang := &Language{}
+	assert.Nil(t, lang.nameProcessor)
+	lang.InitNameProcessor()
+	assert.NotNil(t, lang.nameProcessor)
+}
+
 // Should run the hook
 func TestService_BeforeSave(t *testing.T) {
 	conn := db.NewConnection()
@@ -52,6 +63,16 @@ func TestService_BeforeSave(t *testing.T) {
 	processor.On("GetSynonym", "php").Return("php").Once()
 	repo.AddLanguage("tiobe", "php", 12)
 	processor.AssertExpectations(t)
+}
+
+// Should return the list of available sources
+func TestLanguage_GetAvailableSources(t *testing.T) {
+	conn := db.NewConnection()
+	defer conn.Close()
+	Migrate(conn)
+	lang := &Language{}
+	assert.Contains(t, lang.GetAvailableSources(), "tiobe")
+	assert.Contains(t, lang.GetAvailableSources(), "pypl")
 }
 
 // Setups the tests.

@@ -11,11 +11,17 @@ type CommandRouter struct {
 	rootCmd         *cobra.Command
 	config          *Config
 	scrappersRunner Runner
+	adminRunner     Runner
 }
 
-// server runs server.
+// scrap runs scrappers.
 func (r *CommandRouter) scrap(cmd *cobra.Command, args []string) {
 	r.scrappersRunner.Run(args)
+}
+
+// admin runs admin server.
+func (r *CommandRouter) admin(cmd *cobra.Command, args []string) {
+	r.adminRunner.Run(args)
 }
 
 // Run the router.
@@ -28,6 +34,11 @@ func (r *CommandRouter) Run() {
 			ValidArgs: r.config.scrappers,
 			Args:      cobra.OnlyValidArgs,
 		},
+		&cobra.Command{
+			Use:   "admin",
+			Short: "Run the admin",
+			Run:   r.admin,
+		},
 	)
 	err := r.rootCmd.Execute()
 	if err != nil {
@@ -36,11 +47,12 @@ func (r *CommandRouter) Run() {
 }
 
 // NewCommandRouter creates a new CommandRouter.
-func NewCommandRouter(log ErrorLogger, r Runner) CommandRouter {
+func NewCommandRouter(log ErrorLogger, s, a Runner) CommandRouter {
 	return CommandRouter{
 		config:          NewConfig(),
 		logger:          log,
 		rootCmd:         &cobra.Command{Use: "its-rankings.app"},
-		scrappersRunner: r,
+		scrappersRunner: s,
+		adminRunner:     a,
 	}
 }
