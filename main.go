@@ -4,6 +4,7 @@ package main
 
 import (
 	"github.com/webmalc/it-stats-rankings-scrapper/admin"
+	"github.com/webmalc/it-stats-rankings-scrapper/admin/bindatafs"
 	"github.com/webmalc/it-stats-rankings-scrapper/cmd"
 	"github.com/webmalc/it-stats-rankings-scrapper/common/config"
 	"github.com/webmalc/it-stats-rankings-scrapper/common/db"
@@ -22,6 +23,7 @@ func main() {
 		log,
 		scrappers.NewRunner(),
 		admin.NewAdmin(conn.DB),
+		bindatafs.NewGenerator(),
 	)
 	cmdRouter.Run()
 }

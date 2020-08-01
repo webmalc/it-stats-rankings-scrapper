@@ -10,7 +10,7 @@ import (
 // Should return the config object
 func TestNewConfig(t *testing.T) {
 	c := NewConfig()
-	assert.Equal(t, "localhost:9000", c.AdminURL)
+	assert.Equal(t, ":9000", c.AdminURL)
 	assert.Equal(t, "", c.AdminPath)
 }
 

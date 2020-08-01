@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/webmalc/it-stats-rankings-scrapper/common/db"
 	"github.com/webmalc/it-stats-rankings-scrapper/models/mocks"
 	"github.com/webmalc/it-stats-rankings-scrapper/services"
-	"github.com/webmalc/services-scrapper/common/db"
 )
 
 // Should return a new language object

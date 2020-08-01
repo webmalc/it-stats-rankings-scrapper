@@ -15,7 +15,7 @@ import (
 func TestCommandRouter_Run(t *testing.T) {
 	m := &mocks.ErrorLogger{}
 	r := &mocks.Runner{}
-	cr := NewCommandRouter(m, r, r)
+	cr := NewCommandRouter(m, r, r, r)
 	os.Args = []string{"invalid", "invalid"}
 	m.On("Error", mock.Anything).Return(nil).Once()
 	cr.Run()
@@ -26,7 +26,8 @@ func TestCommandRouter_Run(t *testing.T) {
 func TestNewCommandRouter(t *testing.T) {
 	m := &mocks.ErrorLogger{}
 	r := &mocks.Runner{}
-	cr := NewCommandRouter(m, r, r)
+	g := &mocks.Runner{}
+	cr := NewCommandRouter(m, r, r, g)
 	assert.Equal(t, m, cr.logger)
 	assert.Equal(t, r, cr.scrappersRunner)
 	assert.NotNil(t, cr.rootCmd)
@@ -35,7 +36,8 @@ func TestNewCommandRouter(t *testing.T) {
 func TestCommandRouter_scrap(t *testing.T) {
 	r := &mocks.Runner{}
 	a := &mocks.Runner{}
-	cr := NewCommandRouter(&mocks.ErrorLogger{}, r, a)
+	g := &mocks.Runner{}
+	cr := NewCommandRouter(&mocks.ErrorLogger{}, r, a, g)
 	args := []string{"redmonk", "tiobe"}
 	r.On("Run", args).Return(nil).Once()
 	cr.scrap(&cobra.Command{}, args)
@@ -45,10 +47,21 @@ func TestCommandRouter_scrap(t *testing.T) {
 func TestCommandRouter_admin(t *testing.T) {
 	r := &mocks.Runner{}
 	a := &mocks.Runner{}
-	cr := NewCommandRouter(&mocks.ErrorLogger{}, r, a)
+	g := &mocks.Runner{}
+	cr := NewCommandRouter(&mocks.ErrorLogger{}, r, a, g)
 	a.On("Run", mock.Anything).Return(nil).Once()
 	cr.admin(&cobra.Command{}, []string{})
 	a.AssertExpectations(t)
+}
+
+func TestCommandRouter_bindatafs(t *testing.T) {
+	r := &mocks.Runner{}
+	a := &mocks.Runner{}
+	g := &mocks.Runner{}
+	cr := NewCommandRouter(&mocks.ErrorLogger{}, r, a, g)
+	g.On("Run", mock.Anything).Return(nil).Once()
+	cr.bindatafs(&cobra.Command{}, []string{})
+	g.AssertExpectations(t)
 }
 
 // Setups the tests.

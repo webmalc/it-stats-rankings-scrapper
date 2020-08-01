@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 	"github.com/qor/admin"
+	"github.com/webmalc/it-stats-rankings-scrapper/admin/bindatafs"
 	"github.com/webmalc/it-stats-rankings-scrapper/models"
 )
 
@@ -21,6 +22,7 @@ func (a *Admin) Init() {
 	a.admin = admin.New(&admin.AdminConfig{DB: a.db})
 	entry := models.Language{}
 	lang := a.admin.AddResource(&entry)
+	a.admin.SetAssetFS(bindatafs.AssetFS.NameSpace("admin"))
 
 	lang.IndexAttrs(
 		"ID",

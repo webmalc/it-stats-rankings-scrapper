@@ -17,6 +17,7 @@
 # vendor/
 
 # Project
+app
 .vscode
 .history
 godepgraph.png

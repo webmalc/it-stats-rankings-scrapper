@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  its-rankings-scrapper-postgres:
+    image: postgres:alpine
+    container_name: its-rankings-scrapper-postgres
+    hostname: its-rankings-scrapper-postgres
+    environment:
+      - POSTGRES_DB=its_rankings
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - TZ=UTC
+      - PGTZ=UTC
+    volumes:
+      - its-rankings-scrapper-postgres-data:/var/lib/postgresql/data
+    networks:
+      - its-network
+
+  its-rankings-scrapper:
+    build: .
+    image: it-rankings-scrapper:its
+    container_name: its-rankings-scrapper
+    hostname: its-rankings-scrapper
+    volumes:
+      - its-rankings-scrapper-logs:/go/src/its-rankings-scrapper/logs
+    ports:
+      - "9000:9000"
+    depends_on:
+      - its-rankings-scrapper-postgres
+    networks:
+      - its-network
+
+volumes:
+  its-rankings-scrapper-postgres-data:
+  its-rankings-scrapper-logs:
+
+networks:
+  its-network:

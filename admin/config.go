@@ -12,7 +12,7 @@ type Config struct {
 
 // setDefaults sets the default values
 func setDefaults() {
-	viper.SetDefault("admin_url", "localhost:9000")
+	viper.SetDefault("admin_url", ":9000")
 	viper.SetDefault("admin_path", "")
 }
 
