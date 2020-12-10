@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"context"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -10,14 +13,17 @@ type CommandRouter struct {
 	logger          ErrorLogger
 	rootCmd         *cobra.Command
 	config          *Config
-	scrappersRunner Runner
+	scrappersRunner ContextRunner
 	adminRunner     Runner
 	bindatafsRunner Runner
+	timeout         time.Duration
 }
 
 // scrap runs scrappers.
 func (r *CommandRouter) scrap(cmd *cobra.Command, args []string) {
-	r.scrappersRunner.Run(args)
+	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
+	defer cancel()
+	r.scrappersRunner.Run(ctx, args)
 }
 
 // admin runs admin server.
@@ -32,14 +38,18 @@ func (r *CommandRouter) bindatafs(cmd *cobra.Command, args []string) {
 
 // Run the router.
 func (r *CommandRouter) Run() {
+	scrapCommand := &cobra.Command{
+		Use:       "scrap",
+		Short:     "Run the scrappers",
+		Run:       r.scrap,
+		ValidArgs: r.config.scrappers,
+		Args:      cobra.OnlyValidArgs,
+	}
+	scrapCommand.Flags().DurationVar(
+		&r.timeout, "timeout", r.config.timeout, "timeout for scrapping",
+	)
 	r.rootCmd.AddCommand(
-		&cobra.Command{
-			Use:       "scrap",
-			Short:     "Run the scrappers",
-			Run:       r.scrap,
-			ValidArgs: r.config.scrappers,
-			Args:      cobra.OnlyValidArgs,
-		},
+		scrapCommand,
 		&cobra.Command{
 			Use:   "admin",
 			Short: "Run the admin",
@@ -58,13 +68,17 @@ func (r *CommandRouter) Run() {
 }
 
 // NewCommandRouter creates a new CommandRouter.
-func NewCommandRouter(log ErrorLogger, s, a, b Runner) CommandRouter {
+func NewCommandRouter(
+	log ErrorLogger, admin, bindata Runner, scrapper ContextRunner,
+) CommandRouter {
+	config := NewConfig()
 	return CommandRouter{
-		config:          NewConfig(),
+		config:          config,
 		logger:          log,
 		rootCmd:         &cobra.Command{Use: "its-rankings.app"},
-		scrappersRunner: s,
-		adminRunner:     a,
-		bindatafsRunner: b,
+		scrappersRunner: scrapper,
+		adminRunner:     admin,
+		bindatafsRunner: bindata,
+		timeout:         config.timeout,
 	}
 }

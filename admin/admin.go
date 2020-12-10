@@ -1,9 +1,11 @@
 package admin
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/jinzhu/gorm"
+	clr "github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
 	"github.com/qor/admin"
 	"github.com/webmalc/it-stats-rankings-scrapper/admin/bindatafs"
@@ -61,8 +63,26 @@ func (a *Admin) Init() {
 	})
 }
 
+// startupMessage prints the startup message
+func (a *Admin) getStartupMessage() string {
+	url := a.config.AdminURL
+	if url[0] == ':' {
+		url = "localhost" + url
+	}
+	address := "http"
+	if a.config.AdminSSL {
+		address = "https"
+	}
+	return clr.Sprintf(clr.Green("\nRunning the admin %s://%s%s\n"),
+		clr.Red(address),
+		clr.Red(url),
+		clr.Red(a.config.AdminPath),
+	)
+}
+
 // Run runs the admin
 func (a *Admin) Run(args []string) {
+	fmt.Println(a.getStartupMessage())
 	mux := http.NewServeMux()
 	a.admin.MountTo(a.config.AdminPath, mux)
 	srv := &http.Server{

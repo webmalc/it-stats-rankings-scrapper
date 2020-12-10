@@ -11,6 +11,7 @@ import (
 	"github.com/webmalc/it-stats-rankings-scrapper/common/logger"
 	"github.com/webmalc/it-stats-rankings-scrapper/models"
 	"github.com/webmalc/it-stats-rankings-scrapper/scrappers"
+	"github.com/webmalc/it-stats-rankings-scrapper/services"
 )
 
 func main() {
@@ -19,11 +20,12 @@ func main() {
 	conn := db.NewConnection()
 	defer conn.Close()
 	models.Migrate(conn)
+	repo := models.NewLanguageRepository(conn, services.NewNameNormalizer())
 	cmdRouter := cmd.NewCommandRouter(
 		log,
-		scrappers.NewRunner(),
 		admin.NewAdmin(conn.DB),
 		bindatafs.NewGenerator(),
+		scrappers.NewRunner(repo, log),
 	)
 	cmdRouter.Run()
 }

@@ -19,3 +19,16 @@ func TestNewAdmin(t *testing.T) {
 	assert.NotNil(t, adm.config)
 	assert.NotNil(t, adm.admin)
 }
+
+// Should return a new startup message
+func TestAdmin_startupMessage(t *testing.T) {
+	conn := db.NewConnection()
+	adm := NewAdmin(conn.DB)
+	assert.Contains(t, adm.getStartupMessage(), adm.config.AdminPath)
+	assert.Contains(t, adm.getStartupMessage(), adm.config.AdminURL)
+	assert.Contains(t, adm.getStartupMessage(), "http")
+	adm.config.AdminSSL = true
+	adm.config.AdminPath = "/new"
+	assert.Contains(t, adm.getStartupMessage(), "https")
+	assert.Contains(t, adm.getStartupMessage(), "new")
+}
